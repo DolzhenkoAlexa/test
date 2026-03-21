@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.25)
+
+project(sem2 C)
+set(CMAKE_C_STANDARD 11)
+add_compile_options(-Wall -Wextra -Wpedantic)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+enable_testing()
+
+add_subdirectory(src)
+add_subdirectory(tests)
