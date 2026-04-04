@@ -33,7 +33,7 @@ Table* csvParser(FILE* file)
     int character;
     int pos = 0;
     while ((character = fgetc(file)) != EOF && pos < MAX_BUFFER_SIZE - 1) {
-        table->data[pos++] = (char)character;  // ИСПРАВЛЕНО: явное приведение типа
+        table->data[pos++] = (char)character;
     }
     table->data[pos] = '\0';
     table->dataLength = pos;
@@ -86,7 +86,6 @@ Table* csvParser(FILE* file)
     return table;
 }
 
-// ИСПРАВЛЕНО: добавлен const для параметра columnWidths
 static void printHeader(FILE* output, const int* columnWidths, int columnCount)
 {
     fputc('+', output);
@@ -99,7 +98,6 @@ static void printHeader(FILE* output, const int* columnWidths, int columnCount)
     fputc('\n', output);
 }
 
-// ИСПРАВЛЕНО: добавлен const для параметра columnWidths
 static void printMiddle(FILE* output, const int* columnWidths, int columnCount)
 {
     fputc('+', output);
