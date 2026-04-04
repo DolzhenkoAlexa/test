@@ -6,13 +6,12 @@
 
 #define LINE_TOP    "===================================================================================================="
 #define LINE_MIDDLE "----------------------------------------------------------------------------------------------------"
-#define MAX_BUFFER_SIZE 10000  // Максимальный размер файла
+#define MAX_BUFFER_SIZE 10000
 
 Table* csvParser(FILE* file) {
     Table* table = calloc(1, sizeof(Table));
     if (!table) return NULL;
 
-    // Проверка на пустой файл
     int firstCharacter = fgetc(file);
     if (firstCharacter == EOF) {
         free(table);
@@ -20,28 +19,23 @@ Table* csvParser(FILE* file) {
     }
     ungetc(firstCharacter, file);
 
-    // Выделяем память фиксированного размера
     table->data = malloc(MAX_BUFFER_SIZE);
     if (!table->data) {
         free(table);
         return NULL;
     }
 
-    // Читаем файл
     int character;
-    int pos = 0;
-    while ((character = fgetc(file)) != EOF && pos < MAX_BUFFER_SIZE - 1) {
-        table->data[pos++] = character;
+    int position = 0;
+    while ((character = fgetc(file)) != EOF && position < MAX_BUFFER_SIZE - 1) {
+        table->data[position++] = character;
     }
-    table->data[pos] = '\0';
-    table->dataLength = pos;
+    table->data[position] = '\0';
+    table->dataLength = position;
 
-    // Считаем количество колонок по первой строке
     int columnCount = 1;
     for (int i = 0; i < table->dataLength && table->data[i] != '\n'; i++) {
-        if (table->data[i] == ',') {
-            columnCount++;
-        }
+        if (table->data[i] == ',') columnCount++;
     }
 
     table->columnCount = columnCount;
@@ -52,7 +46,6 @@ Table* csvParser(FILE* file) {
         return NULL;
     }
 
-    // Считаем ширину колонок
     int currentColumn = 0;
     int currentCellLength = 0;
 
@@ -111,8 +104,7 @@ static int isNumeric(const char* string, int length) {
     for (int i = 0; i < length; i++) {
         if (isdigit(string[i])) {
             hasDigit = 1;
-        }
-        else if (string[i] != '.' && string[i] != '-') {
+        } else if (string[i] != '.' && string[i] != '-') {
             return 0;
         }
     }
