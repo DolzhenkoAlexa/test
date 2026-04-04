@@ -2,12 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     const char* inputFile = "input.csv";
     const char* outputFile = "output.txt";
 
-    if (argc >= 2) inputFile = argv[1];
-    if (argc >= 3) outputFile = argv[2];
+    if (argc >= 2)
+        inputFile = argv[1];
+    if (argc >= 3)
+        outputFile = argv[2];
 
     FILE* input = fopen(inputFile, "r");
     if (!input) {
@@ -21,7 +24,8 @@ int main(int argc, char* argv[]) {
     FILE* output = fopen(outputFile, "w");
     if (!output) {
         fprintf(stderr, "Error: Cannot create output file %s\n", outputFile);
-        if (table) freeTable(table);
+        if (table)
+            freeTable(table);
         return 1;
     }
 
