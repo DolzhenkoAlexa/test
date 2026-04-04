@@ -23,7 +23,7 @@ jobs:
           ./csv tests/input3.csv output3.txt
       
       - name: Compile tests
-        run: gcc -Wall -Wextra tests/test_csv.c -o test_csv
+        run: gcc -Wall -Wextra tests/testCsv.c -o test_csv
       
       - name: Run tests
         run: ./test_csv
