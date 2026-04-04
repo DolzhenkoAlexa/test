@@ -1,17 +1,20 @@
 #include "csv.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
-#define LINE_TOP    "===================================================================================================="
+#define LINE_TOP "===================================================================================================="
 #define LINE_MIDDLE "----------------------------------------------------------------------------------------------------"
-#define MAX_BUFFER_SIZE 10000
+#define MAX_BUFFER_SIZE 10000 // Максимальный размер файла
 
-Table* csvParser(FILE* file) {
+Table* csvParser(FILE* file)
+{
     Table* table = calloc(1, sizeof(Table));
-    if (!table) return NULL;
+    if (!table)
+        return NULL;
 
+    // Проверка на пустой файл
     int firstCharacter = fgetc(file);
     if (firstCharacter == EOF) {
         free(table);
@@ -19,23 +22,28 @@ Table* csvParser(FILE* file) {
     }
     ungetc(firstCharacter, file);
 
+    // Выделяем память фиксированного размера
     table->data = malloc(MAX_BUFFER_SIZE);
     if (!table->data) {
         free(table);
         return NULL;
     }
 
+    // Читаем файл
     int character;
-    int position = 0;
-    while ((character = fgetc(file)) != EOF && position < MAX_BUFFER_SIZE - 1) {
-        table->data[position++] = character;
+    int pos = 0;
+    while ((character = fgetc(file)) != EOF && pos < MAX_BUFFER_SIZE - 1) {
+        table->data[pos++] = character;
     }
-    table->data[position] = '\0';
-    table->dataLength = position;
+    table->data[pos] = '\0';
+    table->dataLength = pos;
 
+    // Считаем количество колонок по первой строке
     int columnCount = 1;
     for (int i = 0; i < table->dataLength && table->data[i] != '\n'; i++) {
-        if (table->data[i] == ',') columnCount++;
+        if (table->data[i] == ',') {
+            columnCount++;
+        }
     }
 
     table->columnCount = columnCount;
@@ -46,6 +54,7 @@ Table* csvParser(FILE* file) {
         return NULL;
     }
 
+    // Считаем ширину колонок
     int currentColumn = 0;
     int currentCellLength = 0;
 
@@ -77,7 +86,8 @@ Table* csvParser(FILE* file) {
     return table;
 }
 
-static void printHeader(FILE* output, int* columnWidths, int columnCount) {
+static void printHeader(FILE* output, int* columnWidths, int columnCount)
+{
     fputc('+', output);
     for (int i = 0; i < columnCount; i++) {
         for (int j = 0; j < columnWidths[i] + 2; j++) {
@@ -88,7 +98,8 @@ static void printHeader(FILE* output, int* columnWidths, int columnCount) {
     fputc('\n', output);
 }
 
-static void printMiddle(FILE* output, int* columnWidths, int columnCount) {
+static void printMiddle(FILE* output, int* columnWidths, int columnCount)
+{
     fputc('+', output);
     for (int i = 0; i < columnCount; i++) {
         for (int j = 0; j < columnWidths[i] + 2; j++) {
@@ -99,7 +110,8 @@ static void printMiddle(FILE* output, int* columnWidths, int columnCount) {
     fputc('\n', output);
 }
 
-static int isNumeric(const char* string, int length) {
+static int isNumeric(const char* string, int length)
+{
     int hasDigit = 0;
     for (int i = 0; i < length; i++) {
         if (isdigit(string[i])) {
@@ -111,7 +123,8 @@ static int isNumeric(const char* string, int length) {
     return hasDigit;
 }
 
-static void printCell(FILE* output, char* string, int length, int width, int isNumber) {
+static void printCell(FILE* output, char* string, int length, int width, int isNumber)
+{
     if (isNumber) {
         fprintf(output, " %*.*s |", width, length, string);
     } else {
@@ -119,11 +132,13 @@ static void printCell(FILE* output, char* string, int length, int width, int isN
     }
 }
 
-static void printEmptyCell(FILE* output, int width) {
+static void printEmptyCell(FILE* output, int width)
+{
     fprintf(output, " %*s |", width, "");
 }
 
-void tableMaker(FILE* output, Table* table) {
+void tableMaker(FILE* output, Table* table)
+{
     if (table->columnCount == 0 || table->dataLength == 0) {
         return;
     }
@@ -152,9 +167,7 @@ void tableMaker(FILE* output, Table* table) {
 
             int cellStart = currentPosition;
 
-            while (currentPosition < table->dataLength &&
-                   table->data[currentPosition] != ',' &&
-                   table->data[currentPosition] != '\n') {
+            while (currentPosition < table->dataLength && table->data[currentPosition] != ',' && table->data[currentPosition] != '\n') {
                 currentPosition++;
             }
 
@@ -162,7 +175,7 @@ void tableMaker(FILE* output, Table* table) {
             int isNumber = isNumeric(table->data + cellStart, cellLength);
 
             printCell(output, table->data + cellStart, cellLength,
-                     table->columnWidths[currentColumn], isNumber);
+                table->columnWidths[currentColumn], isNumber);
             currentColumn++;
 
             if (currentPosition < table->dataLength && table->data[currentPosition] == ',') {
@@ -190,7 +203,8 @@ void tableMaker(FILE* output, Table* table) {
     }
 }
 
-void freeTable(Table* table) {
+void freeTable(Table* table)
+{
     if (table) {
         free(table->data);
         free(table->columnWidths);
