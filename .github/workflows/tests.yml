@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+      
+      - name: Compile main program
+        run: gcc -Wall -Wextra src/main.c src/csv.c -o csv -I.
+      
+      - name: Generate output files
+        run: |
+          ./csv tests/input1.csv output1.txt
+          ./csv tests/input2.csv output2.txt
+          ./csv tests/input3.csv output3.txt
+      
+      - name: Compile tests
+        run: gcc -Wall -Wextra tests/test_csv.c -o test_csv
+      
+      - name: Run tests
+        run: ./test_csv
