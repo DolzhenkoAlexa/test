@@ -33,7 +33,7 @@ Table* csvParser(FILE* file)
     int character;
     int pos = 0;
     while ((character = fgetc(file)) != EOF && pos < MAX_BUFFER_SIZE - 1) {
-        table->data[pos++] = character;
+        table->data[pos++] = (char)character;  // ИСПРАВЛЕНО: явное приведение типа
     }
     table->data[pos] = '\0';
     table->dataLength = pos;
@@ -86,7 +86,8 @@ Table* csvParser(FILE* file)
     return table;
 }
 
-static void printHeader(FILE* output, int* columnWidths, int columnCount)
+// ИСПРАВЛЕНО: добавлен const для параметра columnWidths
+static void printHeader(FILE* output, const int* columnWidths, int columnCount)
 {
     fputc('+', output);
     for (int i = 0; i < columnCount; i++) {
@@ -98,7 +99,8 @@ static void printHeader(FILE* output, int* columnWidths, int columnCount)
     fputc('\n', output);
 }
 
-static void printMiddle(FILE* output, int* columnWidths, int columnCount)
+// ИСПРАВЛЕНО: добавлен const для параметра columnWidths
+static void printMiddle(FILE* output, const int* columnWidths, int columnCount)
 {
     fputc('+', output);
     for (int i = 0; i < columnCount; i++) {
@@ -123,7 +125,7 @@ static int isNumeric(const char* string, int length)
     return hasDigit;
 }
 
-static void printCell(FILE* output, char* string, int length, int width, int isNumber)
+static void printCell(FILE* output, const char* string, int length, int width, int isNumber)
 {
     if (isNumber) {
         fprintf(output, " %*.*s |", width, length, string);
